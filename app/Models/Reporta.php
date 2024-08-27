@@ -10,7 +10,6 @@ class Reporta extends Model
 {
     use HasFactory, SoftDeletes; 
 
-    protected $connection = 'blitzvideo'; 
     protected $table = 'reporta';
      
     protected $fillable = [

@@ -63,13 +63,13 @@ return [
             ]) : [],
         ],
         
-        'blitzvideo' => [
+        'blitzvideo_moderadores' => [
             'driver' => 'mysql',
-            'host' => env('BLITZVIDEO_DB_HOST', ''),
-            'port' => env('BLITZVIDEO_DB_PORT', ''),
-            'database' => env('BLITZVIDEO_DB_DATABASE', 'blitzvideo'),
-            'username' => env('BLITZVIDEO_DB_USERNAME', 'root'),
-            'password' => env('BLITZVIDEO_DB_PASSWORD', 'root'),
+            'host' => env('BLITZVIDEO_MODERADORES_DB_HOST', ''),
+            'port' => env('BLITZVIDEO_MODERADORES_DB_PORT', ''),
+            'database' => env('BLITZVIDEO_MODERADORES_DB_DATABASE', 'blitzvideo_moderadores'),
+            'username' => env('BLITZVIDEO_MODERADORES_DB_USERNAME', 'root'),
+            'password' => env('BLITZVIDEO_MODERADORES_DB_PASSWORD', 'root'),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',

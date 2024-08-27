@@ -9,7 +9,6 @@ class Video extends Model
 {
     use SoftDeletes;
 
-    protected $connection = 'blitzvideo'; 
     protected $table = 'videos'; 
 
     protected $fillable = [

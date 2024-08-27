@@ -9,7 +9,6 @@ class ReportaComentario extends Model
 {
     use SoftDeletes;
 
-    protected $connection = 'blitzvideo'; 
     protected $table = 'reporta_comentario';
 
     protected $fillable = [
