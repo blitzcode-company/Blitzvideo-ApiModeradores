@@ -1,0 +1,87 @@
+name: CI Blitzvideo-api
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  pruebas-blitzvideo-api:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_DATABASE: workgroup
+          MYSQL_ROOT_PASSWORD: root
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configurar PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, exif, pcntl, bcmath, intl, mysql
+          ini-values: post_max_size=256M, upload_max_filesize=256M, memory_limit=2G
+          coverage: none
+          tools: composer
+
+      - name: Copiar .env.example a .env
+        run: |
+          if [ -f ".env.example" ]; then
+            cp .env.example .env
+          else
+            echo "El archivo .env.example no encontrado en el directorio raíz"
+            exit 1
+          fi
+
+      - name: Mostrar contenido de .env
+        run: cat .env
+
+      - name: Instalar dependencias
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Generar clave de aplicación
+        run: php artisan key:generate
+
+      - name: Imprimir variables de entorno de la base de datos
+        run: |
+          echo "Variables de entorno de la base de datos:"
+          echo "DB_CONNECTION: $DB_CONNECTION"
+          echo "DB_HOST: $DB_HOST"
+          echo "DB_PORT: $DB_PORT"
+          echo "DB_DATABASE: $DB_DATABASE"
+          echo "DB_USERNAME: $DB_USERNAME"
+          echo "DB_PASSWORD: $DB_PASSWORD"
+
+      - name: Esperar a que MySQL esté listo
+        run: |
+          echo "Esperando a que MySQL esté listo..."
+          while ! mysqladmin ping -h"127.0.0.1" --silent; do
+            sleep 1
+          done
+        env:
+          MYSQL_ROOT_PASSWORD: root
+
+      - name: Crear base de datos
+        run: |
+          mysql -u root -proot -h 127.0.0.1 -e "CREATE DATABASE IF NOT EXISTS blitzvideo;"
+
+      - name: Ejecutar migraciones de la base de datos
+        run: php artisan migrate --force
+
+      - name: Ejecutar sembradoras de la base de datos
+        run: php artisan db:seed --force
+
+      - name: Ejecutar pruebas de características
+        run: vendor/bin/phpunit --testdox tests/Feature
