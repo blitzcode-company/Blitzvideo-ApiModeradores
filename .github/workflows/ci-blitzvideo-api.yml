@@ -1,4 +1,4 @@
-name: CI Blitzvideo-api
+name: CI Blitzvideo-api-moderadores
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  pruebas-blitzvideo-api:
+  pruebas-blitzvideo-api-moderadores:
     runs-on: ubuntu-latest
 
     services:
@@ -16,7 +16,7 @@ jobs:
         ports:
           - 3306:3306
         env:
-          MYSQL_DATABASE: workgroup
+          MYSQL_DATABASE: blitzvideo
           MYSQL_ROOT_PASSWORD: root
         options: >-
           --health-cmd="mysqladmin ping --silent"
