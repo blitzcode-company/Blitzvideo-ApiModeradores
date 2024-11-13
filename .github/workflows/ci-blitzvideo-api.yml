@@ -1,4 +1,4 @@
-name: CI Blitzvideo-api
+name: CI Blitzvideo-apiModeradores
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  pruebas-blitzvideo-api:
+  pruebas-moderadores-api:
     runs-on: ubuntu-latest
 
     services:
@@ -16,7 +16,7 @@ jobs:
         ports:
           - 3306:3306
         env:
-          MYSQL_DATABASE: blitzvideo
+          MYSQL_DATABASE: workgroup
           MYSQL_ROOT_PASSWORD: root
         options: >-
           --health-cmd="mysqladmin ping --silent"
@@ -45,7 +45,7 @@ jobs:
             exit 1
           fi
 
-      - name: Mostrar contenido de .env (opcional)
+      - name: Mostrar contenido de .env
         run: cat .env
 
       - name: Instalar dependencias
@@ -54,7 +54,7 @@ jobs:
       - name: Generar clave de aplicación
         run: php artisan key:generate
 
-      - name: Imprimir variables de entorno de la base de datos (opcional)
+      - name: Imprimir variables de entorno de la base de datos
         run: |
           echo "Variables de entorno de la base de datos:"
           echo "DB_CONNECTION: $DB_CONNECTION"
@@ -62,7 +62,7 @@ jobs:
           echo "DB_PORT: $DB_PORT"
           echo "DB_DATABASE: $DB_DATABASE"
           echo "DB_USERNAME: $DB_USERNAME"
-          # echo "DB_PASSWORD: $DB_PASSWORD"  # Evitar mostrar la contraseña
+          echo "DB_PASSWORD: $DB_PASSWORD"
 
       - name: Esperar a que MySQL esté listo
         run: |
@@ -85,7 +85,7 @@ jobs:
           DB_DATABASE=blitzvideo \
           DB_USERNAME=root \
           DB_PASSWORD=root \
-          php artisan migrate --force
+          php artisan migrate --path=database/migrations --force
 
       - name: Ejecutar sembradoras de la base de datos
         run: |
@@ -95,7 +95,14 @@ jobs:
           DB_DATABASE=blitzvideo \
           DB_USERNAME=root \
           DB_PASSWORD=root \
-          php artisan db:seed --force
+          php artisan db:seed --class=Database\\Seeders\\DatabaseSeeder --force
 
       - name: Ejecutar pruebas de características
-        run: vendor/bin/phpunit --testdox tests/Feature
+        run: |
+          DB_CONNECTION=mysql \
+          DB_HOST=127.0.0.1 \
+          DB_PORT=3306 \
+          DB_DATABASE=blitzvideo \
+          DB_USERNAME=root \
+          DB_PASSWORD=root \
+          vendor/bin/phpunit --testdox tests/Feature
