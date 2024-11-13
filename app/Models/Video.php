@@ -23,8 +23,7 @@ class Video extends Model
 
     public function comentarios()
     {
-        // Aquí está la relación con el modelo Comentario
-        return $this->hasMany(Comentario::class, 'video_id'); // Asegúrate de que 'video_id' sea el campo correcto
+        return $this->hasMany(Comentario::class, 'video_id');
     }
 
     public function canal()
