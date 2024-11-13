@@ -1,4 +1,4 @@
-name: CI Blitzvideo-api-moderadores
+name: CI Blitzvideo-apimoderadores
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  pruebas-blitzvideo-api-moderadores:
+  pruebas-blitzvideo-apimoderadores:
     runs-on: ubuntu-latest
 
     services:
@@ -18,6 +18,7 @@ jobs:
         env:
           MYSQL_DATABASE: blitzvideo
           MYSQL_ROOT_PASSWORD: root
+          MYSQL_USER: root
         options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
@@ -78,10 +79,10 @@ jobs:
           mysql -u root -proot -h 127.0.0.1 -e "CREATE DATABASE IF NOT EXISTS blitzvideo;"
 
       - name: Ejecutar migraciones de la base de datos
-        run: php artisan migrate --force
+        run: php artisan migrate --database=mysql --force
 
       - name: Ejecutar sembradoras de la base de datos
-        run: php artisan db:seed --force
+        run:  php artisan db:seed --database=mysql --force
 
       - name: Ejecutar pruebas de características
         run: vendor/bin/phpunit --testdox tests/Feature
