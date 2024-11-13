@@ -16,7 +16,7 @@ jobs:
         ports:
           - 3306:3306
         env:
-          MYSQL_DATABASE: workgroup
+          MYSQL_DATABASE: blitzvideo
           MYSQL_ROOT_PASSWORD: root
         options: >-
           --health-cmd="mysqladmin ping --silent"
@@ -85,7 +85,7 @@ jobs:
           DB_DATABASE=blitzvideo \
           DB_USERNAME=root \
           DB_PASSWORD=root \
-          php artisan migrate --path=database/migrations --force
+          php artisan migrate --force
 
       - name: Ejecutar sembradoras de la base de datos
         run: |
@@ -95,7 +95,7 @@ jobs:
           DB_DATABASE=blitzvideo \
           DB_USERNAME=root \
           DB_PASSWORD=root \
-          php artisan db:seed --class=Database\\Seeders\\DatabaseSeeder --force
+          php artisan db:seed --force
 
       - name: Ejecutar pruebas de características
         run: |
