@@ -45,7 +45,7 @@ jobs:
             exit 1
           fi
 
-      - name: Mostrar contenido de .env
+      - name: Mostrar contenido de .env (opcional)
         run: cat .env
 
       - name: Instalar dependencias
@@ -54,7 +54,7 @@ jobs:
       - name: Generar clave de aplicación
         run: php artisan key:generate
 
-      - name: Imprimir variables de entorno de la base de datos
+      - name: Imprimir variables de entorno de la base de datos (opcional)
         run: |
           echo "Variables de entorno de la base de datos:"
           echo "DB_CONNECTION: $DB_CONNECTION"
@@ -62,7 +62,7 @@ jobs:
           echo "DB_PORT: $DB_PORT"
           echo "DB_DATABASE: $DB_DATABASE"
           echo "DB_USERNAME: $DB_USERNAME"
-          echo "DB_PASSWORD: $DB_PASSWORD"
+          # echo "DB_PASSWORD: $DB_PASSWORD"  # Evitar mostrar la contraseña
 
       - name: Esperar a que MySQL esté listo
         run: |
