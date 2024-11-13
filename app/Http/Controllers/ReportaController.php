@@ -8,84 +8,82 @@ use App\Models\Video;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 
-
-
 class ReportaController extends Controller
 {
-    public function CrearReporte(Request $request)
+    public function bloquearDesbloquearVideo($videoId, $accion)
     {
-        $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'video_id' => 'required|exists:videos,id',
-            'detalle' => 'nullable|string',
-            'contenido_inapropiado' => 'boolean',
-            'spam' => 'boolean',
-            'contenido_enganoso' => 'boolean',
-            'violacion_derechos_autor' => 'boolean',
-            'incitacion_al_odio' => 'boolean',
-            'violencia_grafica' => 'boolean',
-            'otros' => 'boolean',
-        ]);
+        $video = Video::find($videoId);
 
-        $reporte = Reporta::create($validatedData);
-
-        return response()->json([
-            'message' => 'Reporte creado exitosamente.',
-            'reporte' => $reporte
-        ], 201);
-    }
-
-    public function ValidarReporte(Request $request, $reporteId)
-    {
-        $validatedData = $request->validate([
-            'accion' => 'required|string|in:bloquear,desbloquear',
-        ]);
-
-        $reporte = Reporta::findOrFail($reporteId);
-        $video = Video::findOrFail($reporte->video_id);
-
-        $acciones = [
-            'bloquear' => fn() => $video->update(['estado' => 'bloqueado']),
-            'desbloquear' => fn() => $video->update(['estado' => 'desbloqueado']),
-        ];
-
-        if (array_key_exists($validatedData['accion'], $acciones)) {
-            $acciones[$validatedData['accion']]();
+        if (!$video) {
             return response()->json([
-                'message' => 'Acción realizada exitosamente.',
-                'video' => $video
-            ], 200);
+                'status' => 'error',
+                'message' => 'Video no encontrado.'
+            ], 404);
         }
 
-        return response()->json(['message' => 'Acción no válida.'], 400);
+        if (!in_array($accion, ['bloquear', 'desbloquear'])) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Acción no válida. Use "bloquear" o "desbloquear".'
+            ], 400);
+        }
+
+        $video->bloqueado = ($accion === 'bloquear');
+        $video->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'El video '. $video->id . ' fue ' . ($video->bloqueado ? 'bloqueado' : 'desbloqueado') . ' correctamente.'
+        ]);
     }
+
+    public function obtenerDetalleReporteVideo($reporteId)
+    {
+        $reporte = Reporta::with('user', 'video')->find($reporteId);
+    
+        if ($reporte) {
+            return response()->json([
+                'reportes' => $reporte
+            ]);
+        }
+    
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Reporte no encontrado.'
+        ], 404);
+    }
+
+    public function resolverReporteVideo($reporteId)
+{
+    $reporte = Reporta::find($reporteId);
+
+    if ($reporte) {
+        $reporte->estado = 'resuelto';  
+        $reporte->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Reporte de video resuelto exitosamente.'
+        ]);
+    }
+
+    return response()->json([
+        'status' => 'error',
+        'message' => 'Reporte no encontrado.'
+    ], 404);
+}
 
     public function ListarReportes()
     {
-        $reportes = Reporta::with(['usuario', 'video'])->get();
+        $reportes = Reporta::with(['user', 'video'])->get();
 
         return response()->json([
             'reportes' => $reportes
         ], 200);
     }
 
-    public function ListarReportesDeVideo($videoId)
-    {
-        $reportes = Reporta::where('video_id', $videoId)->with('usuario')->get();
-
-        return response()->json([
-            'reportes' => $reportes
-        ], 200);
-    }
-
-    public function ListarReportesDeUsuario($userId)
-    {
-        $reportes = Reporta::where('user_id', $userId)->with('video')->get();
-
-        return response()->json([
-            'reportes' => $reportes
-        ], 200);
-    }
+   
+   
 
     public function ModificarReporte(Request $request, $reporteId)
     {
@@ -111,26 +109,51 @@ class ReportaController extends Controller
 
     public function BorrarReporte($reporteId)
     {
-        $reporte = Reporta::findOrFail($reporteId);
-        $reporte->delete();
+        $reporte = Reporta::find($reporteId);
 
-        return response()->json([
-            'message' => 'Reporte borrado exitosamente.'
-        ], 200);
-    }
-
-    public function BorrarReportesDeVideo($videoId)
-    {
-        $reportes = Reporta::where('video_id', $videoId)->get();
-
-        foreach ($reportes as $reporte) {
+        if ($reporte) {
             $reporte->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Reporte de video eliminado correctamente.'
+            ]);
         }
 
         return response()->json([
-            'message' => 'Todos los reportes del video han sido borrados exitosamente.'
-        ], 200);
+            'status' => 'error',
+            'message' => 'Reporte no encontrado.'
+        ], 404);
     }
 
+  
+    public function listarReportesResueltosVideos()
+    {
+        $reportesResueltos = Reporta::where('estado', Reporta::ESTADO_RESUELTO)
+                                    ->with(['user', 'video'])->get();
+
+        return response()->json([
+            'reportes' => $reportesResueltos
+        ]);
+    }
+
+    public function listarReportesNoResueltosVideos()
+    {
+        $reportesNoResueltos =Reporta::where('estado', Reporta::ESTADO_PENDIENTE)
+                                       ->with(['user', 'video'])->get();
+
+        return response()->json([
+            'reportes' => $reportesNoResueltos
+        ]);
+    }
+
+
+    public function conteoVideos()
+    {
+        return response()->json([
+            'pendientes' => Reporta::where('estado', Reporta::ESTADO_PENDIENTE)->count(),
+            'resueltos' => Reporta::where('estado', Reporta::ESTADO_RESUELTO)->count(),
+        ]);
+    }
 
 }

@@ -21,6 +21,12 @@ class Video extends Model
         'estado',
     ];
 
+    public function comentarios()
+    {
+        // Aquí está la relación con el modelo Comentario
+        return $this->hasMany(Comentario::class, 'video_id'); // Asegúrate de que 'video_id' sea el campo correcto
+    }
+
     public function canal()
     {
         return $this->belongsTo(Canal::class);

@@ -10,6 +10,9 @@ class Reporta extends Model
 {
     use HasFactory, SoftDeletes; 
 
+    const ESTADO_RESUELTO = 'resuelto';
+    const ESTADO_PENDIENTE = 'pendiente';
+
     protected $table = 'reporta';
      
     protected $fillable = [
@@ -22,10 +25,11 @@ class Reporta extends Model
         'violacion_derechos_autor',
         'incitacion_al_odio',
         'violencia_grafica',
+        'estado',
         'otros',
     ];
 
-    public function usuario()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }

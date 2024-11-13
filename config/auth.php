@@ -106,6 +106,9 @@ return [
     |
     */
 
+    'api_url' => env('AUTH_API_URL', 'http://oauthapi-moderadores:8000/api/v1/validate'),
+
+
     'password_timeout' => 10800,
 
 ];

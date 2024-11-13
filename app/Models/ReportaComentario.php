@@ -9,6 +9,9 @@ class ReportaComentario extends Model
 {
     use SoftDeletes;
 
+    const ESTADO_RESUELTO = 'resuelto';
+    const ESTADO_PENDIENTE = 'pendiente';
+
     protected $table = 'reporta_comentario';
 
     protected $fillable = [
@@ -19,6 +22,7 @@ class ReportaComentario extends Model
         'spam',
         'contenido_enganoso',
         'incitacion_al_odio',
+        'estado',
         'acoso',
         'contenido_sexual',
         'otros',
@@ -31,6 +35,6 @@ class ReportaComentario extends Model
 
     public function comentario()
     {
-        return $this->belongsTo(Comentario::class);
+        return $this->belongsTo(Comentario::class, 'comentario_id');
     }
 }

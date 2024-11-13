@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportaComentarioController;
 use App\Http\Controllers\ReportaController;
+use App\Http\Controllers\ReportaUsuarioController;
 
 
 /*
@@ -16,24 +17,53 @@ use App\Http\Controllers\ReportaController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
 Route::prefix('v1')->middleware('auth.api')->group(function () {
-    Route::prefix('reporte')->group(function () {
-        Route::post('/', [ReportaController::class, 'CrearReporte']);
-        Route::get('/', [ReportaController::class, 'ListarReportes']);
-        Route::put('/{reporteId}/validar', [ReportaController::class, 'ValidarReporte']);
-        Route::get('/video/{videoId}', [ReportaController::class, 'ListarReportesDeVideo']);
-        Route::get('/usuario/{userId}', [ReportaController::class, 'ListarReportesDeUsuario']);
-        Route::put('/{reporteId}', [ReportaController::class, 'ModificarReporte']);
-        Route::delete('/{reporteId}', [ReportaController::class, 'BorrarReporte']);
-        Route::delete('/video/{videoId}', [ReportaController::class, 'BorrarReportesDeVideo']);
 
-        Route::post('/comentario', [ReportaComentarioController::class, 'CrearReporte']);
-        Route::get('/comentario', [ReportaComentarioController::class, 'ListarReportes']);
-        Route::get('/comentario/{comentarioId}', [ReportaComentarioController::class, 'ListarReportesDeComentario']);
-        Route::get('/comentario/usuario/{userId}', [ReportaComentarioController::class, 'ListarReportesDeUsuario']);
-        Route::put('/{reporteId}/comentario', [ReportaComentarioController::class, 'ModificarReporte']);
-        Route::delete('/{reporteId}/comentario', [ReportaComentarioController::class, 'BorrarReporte']);
-        Route::delete('/comentario/{comentarioId}', [ReportaComentarioController::class, 'BorrarReportesDeComentario']);
+    Route::prefix('video')->group(function () {
+        Route::get('/reporte', [ReportaController::class, 'ListarReportes']);
+        Route::get('/reporte/resueltos', [ReportaController::class, 'listarReportesResueltosVideos']);
+        Route::get('/reporte/no-resueltos', [ReportaController::class, 'listarReportesNoResueltosVideos']);
+        Route::get('/reporte/{reporteId}', [ReportaController::class, 'obtenerDetalleReporteVideo']);
+        
+        Route::put('/reporte/{reporteId}/resolver', [ReportaController::class, 'resolverReporteVideo']);
+        Route::put('/reporte/{reporteId}', [ReportaController::class, 'ModificarReporte']);
+        Route::delete('/reporte/{reporteId}', [ReportaController::class, 'BorrarReporte']);
+
+
+        Route::put('/{videoId}/{accion}', [ReportaController::class, 'bloquearDesbloquearVideo']);
+        Route::get('/conteo', [ReportaController::class, 'conteoVideos']);
+
+    });
+
+    Route::prefix('comentario')->group(function () {
+        Route::get('/reporte', [ReportaComentarioController::class, 'ListarReportes']);
+        Route::get('/reporte/resueltos', [ReportaComentarioController::class, 'listarReportesResueltosComentarios']);
+        Route::get('/reporte/no-resueltos', [ReportaComentarioController::class, 'listarReportesNoResueltosComentarios']);
+        Route::get('/reporte/{reporteId}', [ReportaComentarioController::class, 'obtenerDetalleReporteComentario']);
+
+        Route::put('/reporte/{reporteId}/resolver', [ReportaComentarioController::class, 'resolverReporteComentario']);
+        Route::put('/reporte/{reporteId}', [ReportaComentarioController::class, 'ModificarReporte']);
+        Route::delete('/reporte/{reporteId}', [ReportaComentarioController::class, 'BorrarReporte']);
+
+ 
+        Route::put('/{comentarioId}/{accion}', [ReportaComentarioController::class, 'bloquearDesbloquearComentario']);
+        Route::get('/conteo', [ReportaComentarioController::class, 'conteoComentarios']);
+
+    });
+
+    Route::prefix('usuario')->group(function () {
+        Route::get('/reporte', [ReportaUsuarioController::class, 'ListarReportes']);
+        Route::get('/reporte/resueltos', [ReportaUsuarioController::class, 'listarReportesResueltos']);
+        Route::get('/reporte/no-resueltos', [ReportaUsuarioController::class, 'listarReportesNoResueltos']);
+        Route::get('/reporte/{reporteId}', [ReportaUsuarioController::class, 'obtenerDetalleReporteUsuario']);
+
+        Route::put('/reporte/{reporteId}/resolver', [ReportaUsuarioController::class, 'resolverReporteUsuario']);
+        Route::put('/reporte/{reporteId}', [ReportaUsuarioController::class, 'ModificarReporte']);
+        Route::delete('/reporte/{reporteId}', [ReportaUsuarioController::class, 'BorrarReporte']);
+
+        
+        Route::put('/{userId}/{accion}', [ReportaUsuarioController::class, 'bloquearDesbloquearUsuario']);
+        Route::get('/conteo', [ReportaUsuarioController::class, 'conteoUsuarios']);
+
     });
 });
