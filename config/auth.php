@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'ldap' => [
+            'driver' => 'ldap',
+            'provider' => 'ldap_users',
+        ],
     ],
 
     /*
@@ -64,6 +68,13 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
+        'ldap_users' => [
+            'driver' => 'ldap',
+            'model' => LdapRecord\Models\ActiveDirectory\User::class,
+        'database' => [
+            'connection' => 'mysql',
+        ],
+    ],
 
         // 'users' => [
         //     'driver' => 'database',

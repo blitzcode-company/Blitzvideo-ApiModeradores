@@ -19,6 +19,11 @@ use App\Http\Controllers\ReportaUsuarioController;
 */
 Route::prefix('v1')->middleware('auth.api')->group(function () {
 
+    Route::post('login', [LdapLoginController::class, 'login']);
+    Route::post('logout', [LdapLoginController::class, 'logout']);
+    Route::get('user', [LoginController::class, 'obtenerDatosUser']);
+
+
     Route::prefix('video')->group(function () {
         Route::get('/reporte', [ReportaController::class, 'ListarReportes']);
         Route::get('/reporte/resueltos', [ReportaController::class, 'listarReportesResueltosVideos']);
