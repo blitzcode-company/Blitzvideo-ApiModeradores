@@ -12,7 +12,7 @@ class UsuarioSitio extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $table = 'moderadores';
+    protected $table = 'users';
     /**
      * The attributes that are mass assignable.
      *
@@ -43,5 +43,28 @@ class UsuarioSitio extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-   
+    public function canales()
+    {
+        return $this->hasMany(Canal::class);
+    }
+
+    public function visitas()
+    {
+        return $this->hasMany(Visita::class);
+    }
+
+    public function playlists()
+    {
+        return $this->hasMany(Playlist::class);
+    }
+
+    public function reportaComentarios()
+    {
+        return $this->hasMany(ReportaComentario::class);
+    }
+
+    public function canalesSuscritos()
+    {
+        return $this->belongsToMany(Canal::class, 'suscribe')->withTimestamps()->withTrashed();
+    }
 }

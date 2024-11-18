@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\UsuarioSitio;
 use App\Models\ReportaUsuario;
 
 class ReportaUsuarioController extends Controller
@@ -122,7 +122,7 @@ public function listarReportesNoResueltos()
 
     public function bloquearDesbloquearUsuario($userId, $accion)
     {
-        $user = User::find($userId);
+        $user = UsuarioSitio::find($userId);
 
         if (!$user) {
             return response()->json([

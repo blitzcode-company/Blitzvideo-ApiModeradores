@@ -1,61 +1,84 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Validator;
-use LdapRecord\Models\ActiveDirectory\User as LdapUser;
-use LdapRecord\Laravel\Auth\Guard as LdapAuth;
 use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
-    protected $ldapAuth;
-
-    public function __construct(LdapAuth $ldapAuth)
-    {
-        $this->ldapAuth = $ldapAuth;
-    }
-
     public function login(Request $request)
     {
+        if (app()->environment('local') && env('SIMULATE_LDAP_LOGIN', false)) {
+            return $this->loginTestLDAP($request);
+        }
+
         $validator = Validator::make($request->all(), [
             'username' => 'required|string',
             'password' => 'required|string',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['error' => 'Datos inválidos'], 400);
+            return response()->json([
+                'message' => 'Error de validacion',
+                'errors' => $validator->errors(),
+            ], 422);
         }
 
+        $this->ensureIsNotRateLimited($request);
+
         $credentials = [
-            'samaccountname' => $request->username, 
+            'samaccountname' => $request->username,
             'password' => $request->password,
         ];
 
-        if ($this->ldapAuth->attempt($credentials)) {
-            $user = $this->ldapAuth->user();
-
-            $token = $user->createToken('API Token')->plainTextToken;
-
-            return response()->json([
-                'message' => 'Inicio de sesión exitoso.',
-                'token' => $token,
-            ], 200);
+        if (!Auth::attempt($credentials)) {
+            return $this->handleFailedLogin($request);
         }
 
-        throw ValidationException::withMessages([
-            'username' => ['Las credenciales no son válidas o el usuario no pertenece a la unidad organizativa permitida.'],
+        $user = Auth::user();
+        $token = $user->createToken('API Token')->plainTextToken;
+
+        RateLimiter::clear($this->throttleKey($request));
+
+        return response()->json([
+            'message' => 'Login exitoso',
+            'user' => $user,
+            'token' => $token,
         ]);
     }
 
-    public function logout()
+    private function loginTestLDAP(Request $request)
     {
-        Auth::logout();
-        return response()->json(['message' => 'Cierre de sesión exitoso.'], 200);
+        $user = User::where('username', $request->username)->first();
+
+        if ($user) {
+            $token = $user->createToken('API Token')->plainTextToken;
+
+            return response()->json([
+                'message' => 'Login exitoso (simulated)',
+                'user' => $user,
+                'token' => $token,
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Usuario no encontrado en el entorno de desarrollo.',
+        ], 404);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logout exitoso',
+        ]);
     }
 
     protected function ensureIsNotRateLimited(Request $request): void

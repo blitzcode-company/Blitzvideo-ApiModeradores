@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ReportaComentario;
 use App\Models\Comentario;
-use App\Models\User;
+use App\Models\UsuarioSitio;
 use Illuminate\Support\Facades\Http;
 
 

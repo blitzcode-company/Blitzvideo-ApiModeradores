@@ -18,7 +18,7 @@ class MeGusta extends Model
 
     public function usuario()
     {
-        return $this->belongsTo(User::class, 'usuario_id');
+        return $this->belongsTo(UsuarioSitio::class, 'usuario_id');
     }
 
     public function comentario()

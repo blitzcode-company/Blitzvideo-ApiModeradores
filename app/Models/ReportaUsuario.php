@@ -30,11 +30,11 @@ class ReportaUsuario extends Model
 
     public function reportante()
     {
-        return $this->belongsTo(User::class, 'id_reportante');
+        return $this->belongsTo(UsuarioSitio::class, 'id_reportante');
     }
 
     public function reportado()
     {
-        return $this->belongsTo(User::class, 'id_reportado');
+        return $this->belongsTo(UsuarioSitio::class, 'id_reportado');
     }
 }

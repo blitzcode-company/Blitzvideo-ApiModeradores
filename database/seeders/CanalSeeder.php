@@ -3,14 +3,14 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\User;
+use App\Models\UsuarioSitio;
 use App\Models\Canal;
 
 class CanalSeeder extends Seeder
 {
     public function run()
     {
-        $users = User::all();
+        $users = UsuarioSitio::all();
 
         foreach ($users as $user) {
             Canal::create([

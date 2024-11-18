@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 use App\Models\ReportaUsuario;
-use App\Models\User;
+use App\Models\UsuarioSitio;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 
 class ReportaUsuarioTest extends TestCase
@@ -93,7 +93,7 @@ class ReportaUsuarioTest extends TestCase
 
     public function testSePuedeBloquearODesbloquearUnUsuario()
     {
-        $user = User::first();
+        $user = UsuarioSitio::first();
     
         $response = $this->putJson($this->baseUrl() . "usuario/{$user->id}/bloquear");
         $response->assertStatus(200);

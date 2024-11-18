@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Canal;
 use App\Models\Publicidad;
-use App\Models\User;
+use App\Models\UsuarioSitio;
 use App\Models\Video;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -50,7 +50,7 @@ class PublicidadSeeder extends Seeder
         ];
 
         foreach ($empresas as $empresa) {
-            $user = User::create([
+            $user = UsuarioSitio::create([
                 'name' => $empresa['empresa'],
                 'email' => $empresa['email'],
                 'password' => Hash::make('password'),

@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\User;
+use App\Models\UsuarioSitio;
 use App\Models\Video;
 use App\Models\Visita;
 
@@ -11,7 +11,7 @@ class VisitaSeeder extends Seeder
 {
     public function run()
     {
-        $usuarios = User::all();
+        $usuarios = UsuarioSitio::all();
         $videos = Video::all();
 
         foreach ($usuarios as $usuario) {

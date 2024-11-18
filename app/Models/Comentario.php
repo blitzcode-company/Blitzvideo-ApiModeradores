@@ -26,7 +26,7 @@ class Comentario extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'usuario_id');
+        return $this->belongsTo(UsuarioSitio::class, 'usuario_id');
     }
 
     public function video()

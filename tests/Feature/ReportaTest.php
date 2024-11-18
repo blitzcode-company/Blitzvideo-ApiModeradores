@@ -7,7 +7,7 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Reporta;
 use App\Models\Video;
-use App\Models\User;
+use App\Models\UsuarioSitio;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 
 

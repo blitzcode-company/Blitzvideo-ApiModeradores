@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\User;
+use App\Models\UsuarioSitio;
 use Illuminate\Support\Facades\Hash;
 use Faker\Factory as Faker;
 
@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
         foreach ($names as $name) {
             $email = strtolower($name) . '@gmail.com';
 
-            User::create([
+            UsuarioSitio::create([
                 'name' => $name,
                 'email' => $email,
                 'email_verified_at' => now(),

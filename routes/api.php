@@ -19,8 +19,8 @@ use App\Http\Controllers\ReportaUsuarioController;
 */
 Route::prefix('v1')->middleware('auth.api')->group(function () {
 
-    Route::post('login', [LdapLoginController::class, 'login']);
-    Route::post('logout', [LdapLoginController::class, 'logout']);
+    Route::post('login', [LoginController::class, 'login']);
+    Route::post('logout', [LoginController::class, 'logout']);
     Route::get('user', [LoginController::class, 'obtenerDatosUser']);
 
 
