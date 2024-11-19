@@ -53,6 +53,22 @@ class LoginController extends Controller
         ]);
     }
 
+    public function obtenerDatosUser(Request $request) {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Usuario no autenticado'], 401);
+        }
+
+        return response()->json([
+            'message' => 'Usuario autenticado', 
+            'user' => $user
+        ]);
+
+    }
+
+
+
     private function loginTestLDAP(Request $request)
     {
         $user = User::where('username', $request->username)->first();

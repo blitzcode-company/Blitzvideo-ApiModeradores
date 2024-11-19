@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportaComentarioController;
 use App\Http\Controllers\ReportaController;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ReportaUsuarioController;
 
 
@@ -17,11 +18,11 @@ use App\Http\Controllers\ReportaUsuarioController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::prefix('v1')->middleware('auth.api')->group(function () {
+Route::prefix('v1')->group(function () {
 
-    Route::post('login', [LoginController::class, 'login']);
-    Route::post('logout', [LoginController::class, 'logout']);
-    Route::get('user', [LoginController::class, 'obtenerDatosUser']);
+    Route::post('login', [LoginController::class, '/login']);
+    Route::post('logout', [LoginController::class, '/logout']);
+    Route::middleware('auth:sanctum')->get('/user', [LoginController::class, 'obtenerDatosUser']);
 
 
     Route::prefix('video')->group(function () {

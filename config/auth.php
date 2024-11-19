@@ -65,14 +65,20 @@ return [
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\User::class,
-        ],
-        'ldap_users' => [
             'driver' => 'ldap',
             'model' => LdapRecord\Models\ActiveDirectory\User::class,
-        'database' => [
-            'connection' => 'mysql',
+            'rules' => [
+                App\Ldap\Rules\Moderadores::class,
+            ],
+            'scopes' => [],
+            'database' => [
+                'model' => App\Models\User::class,
+                'sync_attributes' => [
+                    'name' => 'cn',
+                    'username' => 'samaccountname',
+                    'email' => 'mail'
+                ],
+            ],
         ],
     ],
 
@@ -80,7 +86,7 @@ return [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
-    ],
+    
 
     /*
     |--------------------------------------------------------------------------
