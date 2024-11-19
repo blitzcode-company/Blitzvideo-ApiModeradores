@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Http\JsonResponse;
+
 
 class LoginController extends Controller
 {
@@ -103,9 +105,19 @@ class LoginController extends Controller
         }
     }
 
-    protected function handleFailedLogin(Request $request): void
+    protected function handleFailedLogin(Request $request): JsonResponse
     {
         RateLimiter::hit($this->throttleKey($request));
+
+        if (session('ldap_auth_error') === 'rule_failed') {
+            return response()->json(['message' => 'El usuario no pertenece al grupo Moderadores'], 405);
+        }
+
+        if (!session()->has('ldap_auth_error')) {
+            return response()->json(['message' => 'Credenciales invalidas, verifique sus datos'], 401);
+        }
+        
+
 
         throw ValidationException::withMessages([
             'username' => trans('auth.failed'),

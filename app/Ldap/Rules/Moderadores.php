@@ -13,9 +13,14 @@ class Moderadores implements Rule
      */
     public function passes(LdapRecord $user, Eloquent $model = null): bool
     {
-       return $user->groups()->exists(
+       $isInGroup = $user->groups()->exists(
         'CN=moderadoresdeblitzvideo,OU=Blitzcode-dev,DC=Blitzcode,DC=company'
        );
-        
+       
+       if (!$isInGroup) {
+        session(['ldap_auth_error' => 'rule_failed']);
+
+       }
+       return $isInGroup;
     }
 }
