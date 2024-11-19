@@ -20,8 +20,8 @@ use App\Http\Controllers\ReportaUsuarioController;
 */
 Route::prefix('v1')->group(function () {
 
-    Route::post('login', [LoginController::class, '/login']);
-    Route::post('logout', [LoginController::class, '/logout']);
+    Route::post('/login', [LoginController::class, 'login']);
+    Route::post('/logout', [LoginController::class, 'logout']);
     Route::middleware('auth:sanctum')->get('/user', [LoginController::class, 'obtenerDatosUser']);
 
 
