@@ -18,35 +18,35 @@ class LoginController extends Controller
         if (app()->environment('local') && env('SIMULATE_LDAP_LOGIN', false)) {
             return $this->loginTestLDAP($request);
         }
-
+    
         $validator = Validator::make($request->all(), [
             'username' => 'required|string',
             'password' => 'required|string',
         ]);
-
+    
         if ($validator->fails()) {
             return response()->json([
-                'message' => 'Error de validacion',
+                'message' => 'Error de validación',
                 'errors' => $validator->errors(),
             ], 422);
         }
-
+    
         $this->ensureIsNotRateLimited($request);
-
+    
         $credentials = [
-            'samaccountname' => $request->username,
+            app()->environment('local') ? 'username' : 'samaccountname' => $request->username,
             'password' => $request->password,
         ];
-
-        if (!Auth::attempt($credentials)) {
+    
+        if (!Auth::guard('api')->attempt($credentials)) {
             return $this->handleFailedLogin($request);
         }
-
-        $user = Auth::user();
-        $token = $user->createToken('API Token')->plainTextToken;
-
+    
+        $user = Auth::guard('api')->user();
+        $token = $user->createToken('api-token')->plainTextToken;
+    
         RateLimiter::clear($this->throttleKey($request));
-
+    
         return response()->json([
             'message' => 'Login exitoso',
             'user' => $user,
@@ -54,7 +54,8 @@ class LoginController extends Controller
         ]);
     }
 
-    public function obtenerDatosUser(Request $request) {
+    public function obtenerDatosUser(Request $request)
+    {
         $user = $request->user();
 
         if (!$user) {
@@ -62,28 +63,30 @@ class LoginController extends Controller
         }
 
         return response()->json([
-            'message' => 'Usuario autenticado', 
+            'message' => 'Usuario autenticado',
             'user' => $user
         ]);
-
     }
 
 
 
     private function loginTestLDAP(Request $request)
     {
-        $user = User::where('username', $request->username)->first();
-
+    
+        $user = User::where('name', $request->username)->first();
+    
         if ($user) {
-            $token = $user->createToken('API Token')->plainTextToken;
-
+            $token = $user->createToken('api-token')->plainTextToken;
+            \Log::info('Token generado', ['user_id' => $user->id, 'token' => $token]);
+    
             return response()->json([
                 'message' => 'Login exitoso (simulated)',
                 'user' => $user,
                 'token' => $token,
             ]);
         }
-
+    
+        \Log::error('Usuario no encontrado', ['name' => $request->username]);
         return response()->json([
             'message' => 'Usuario no encontrado en el entorno de desarrollo.',
         ], 404);

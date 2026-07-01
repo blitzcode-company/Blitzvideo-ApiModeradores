@@ -6,6 +6,9 @@ use App\Http\Controllers\ReportaComentarioController;
 use App\Http\Controllers\ReportaController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ReportaUsuarioController;
+use App\Http\Controllers\ActividadController;
+use App\Http\Controllers\EstadisticasController;
+use App\Http\Controllers\SancionesController;
 
 
 /*
@@ -21,8 +24,11 @@ use App\Http\Controllers\ReportaUsuarioController;
 Route::prefix('v1')->group(function () {
 
     Route::post('/login', [LoginController::class, 'login']);
-    Route::post('/logout', [LoginController::class, 'logout']);
-    Route::middleware('auth:sanctum')->get('/user', [LoginController::class, 'obtenerDatosUser']);
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/logout', [LoginController::class, 'logout']);
+        Route::get('/user', [LoginController::class, 'obtenerDatosUser']);
+    });
+
 
 
     Route::prefix('video')->group(function () {
@@ -72,4 +78,22 @@ Route::prefix('v1')->group(function () {
         Route::get('/conteo', [ReportaUsuarioController::class, 'conteoUsuarios']);
 
     });
+
+    Route::prefix('actividad')->group(function () {
+        Route::get('/historial', [ActividadController::class, 'ListarActividad']);
+    });
+
+    Route::prefix('moderadores')->group(function () {
+        Route::prefix('estadisticas')->group(function () {
+            Route::get('/general', [EstadisticasController::class, 'obtenerEstadisticasGenerales']);
+            Route::get('/periodo/{periodo}', [EstadisticasController::class, 'obtenerEstadisticasPorPeriodo']);
+            Route::get('/distribucion', [EstadisticasController::class, 'obtenerDistribucionReportes']);
+            Route::get('/usuarios-reportados', [EstadisticasController::class, 'obtenerUsuariosMasReportados']);
+            Route::get('/contenido-reportado', [EstadisticasController::class, 'obtenerContenidoMasReportado']);
+            Route::get('/tiempo-resolucion', [EstadisticasController::class, 'obtenerTiempoResolucion']);
+            Route::get('/sanciones', [EstadisticasController::class, 'obtenerResumenSanciones']);
+        });
+
+    });
+
 });

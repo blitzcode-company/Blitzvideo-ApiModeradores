@@ -68,7 +68,8 @@ return [
     */
 
     'timezone' => 'UTC',
-
+    
+    'visualizer_host' => env('VISUALIZER_HOST'),
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration

@@ -39,6 +39,10 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
+         ],
+        'api' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
         ],
         'ldap' => [
             'driver' => 'ldap',
@@ -64,7 +68,10 @@ return [
     */
 
     'providers' => [
-        'users' => [
+        'users' => env('APP_ENV') === 'local' ? [
+            'driver' => 'eloquent',
+            'model' => App\Models\User::class,
+        ] : [
             'driver' => 'ldap',
             'model' => LdapRecord\Models\ActiveDirectory\User::class,
             'rules' => [
@@ -123,7 +130,7 @@ return [
     |
     */
 
-    'api_url' => env('AUTH_API_URL', 'http://oauthapi-moderadores:8000/api/v1/validate'),
+    'api_url' => env('AUTH_API_URL', ''),
 
 
     'password_timeout' => 10800,

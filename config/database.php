@@ -63,13 +63,13 @@ return [
             ]) : [],
         ],
         
-        'blitzvideo_moderadores' => [
+        'blitzvideo' => [
             'driver' => 'mysql',
-            'host' => env('BLITZVIDEO_MODERADORES_DB_HOST', ''),
-            'port' => env('BLITZVIDEO_MODERADORES_DB_PORT', ''),
-            'database' => env('BLITZVIDEO_MODERADORES_DB_DATABASE', 'blitzvideo_moderadores'),
-            'username' => env('BLITZVIDEO_MODERADORES_DB_USERNAME', 'root'),
-            'password' => env('BLITZVIDEO_MODERADORES_DB_PASSWORD', 'root'),
+            'host' => env('BLITZVIDEO_DB_HOST', ''),
+            'port' => env('BLITZVIDEO_DB_PORT', ''),
+            'database' => env('BLITZVIDEO_DB_DATABASE', 'blitzvideo'),
+            'username' => env('BLITZVIDEO_DB_USERNAME', 'root'),
+            'password' => env('BLITZVIDEO_DB_PASSWORD', 'root'),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
@@ -143,14 +143,14 @@ return [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
             'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
         ],
-
-        'default' => [
+         'default' => [
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', '6379'),
             'database' => env('REDIS_DB', '0'),
         ],
+
 
         'cache' => [
             'url' => env('REDIS_URL'),
