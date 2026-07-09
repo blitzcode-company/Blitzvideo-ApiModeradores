@@ -5,6 +5,7 @@ namespace App\Ldap\Rules;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use LdapRecord\Laravel\Auth\Rule;
 use LdapRecord\Models\Model as LdapRecord;
+use Illuminate\Support\Facades\Log;
 
 class Moderadores implements Rule
 {
@@ -13,14 +14,24 @@ class Moderadores implements Rule
      */
     public function passes(LdapRecord $user, Eloquent $model = null): bool
     {
-       $isInGroup = $user->groups()->exists(
-        'CN=moderadoresdeblitzvideo,OU=Blitzcode-dev,DC=Blitzcode,DC=company'
-       );
-       
-       if (!$isInGroup) {
-        session(['ldap_auth_error' => 'rule_failed']);
+ Log::info('Usuario LDAP', [
+            'dn' => $user->getDn(),
+        ]);
 
-       }
-       return $isInGroup;
+        foreach ($user->groups as $group) {
+            Log::info('Grupo', [
+                'dn' => $group->getDn(),
+            ]);
+        }
+
+        $isInGroup = $user->groups()->exists(
+            'CN=moderadoresdeblitzvideo,OU=Blitzcode-dev,DC=Blitzcode,DC=company'
+        );
+
+        Log::info('¿Pertenece al grupo?', [
+            'resultado' => $isInGroup,
+        ]);
+
+        return $isInGroup;
     }
 }
