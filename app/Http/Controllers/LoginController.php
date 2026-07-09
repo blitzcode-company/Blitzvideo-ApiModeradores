@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -10,15 +9,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 
-
 class LoginController extends Controller
 {
     public function login(Request $request)
     {
-        if (app()->environment('local') && env('SIMULATE_LDAP_LOGIN', false)) {
-            return $this->loginTestLDAP($request);
-        }
-    
         $validator = Validator::make($request->all(), [
             'username' => 'required|string',
             'password' => 'required|string',
@@ -34,12 +28,19 @@ class LoginController extends Controller
         $this->ensureIsNotRateLimited($request);
     
         $credentials = [
-            app()->environment('local') ? 'username' : 'samaccountname' => $request->username,
+            'samaccountname' => $request->username,
             'password' => $request->password,
         ];
     
-        if (!Auth::guard('web')->attempt($credentials)) {
-            return $this->handleFailedLogin($request);
+        try {
+            if (!Auth::guard('web')->attempt($credentials)) {
+                return $this->handleFailedLogin($request);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error crítico interno del servidor al procesar el login.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     
         $user = Auth::guard('web')->user();
@@ -68,30 +69,6 @@ class LoginController extends Controller
         ]);
     }
 
-
-
-    private function loginTestLDAP(Request $request)
-    {
-    
-        $user = User::where('name', $request->username)->first();
-    
-        if ($user) {
-            $token = $user->createToken('api-token')->plainTextToken;
-            \Log::info('Token generado', ['user_id' => $user->id, 'token' => $token]);
-    
-            return response()->json([
-                'message' => 'Login exitoso (simulated)',
-                'user' => $user,
-                'token' => $token,
-            ]);
-        }
-    
-        \Log::error('Usuario no encontrado', ['name' => $request->username]);
-        return response()->json([
-            'message' => 'Usuario no encontrado en el entorno de desarrollo.',
-        ], 404);
-    }
-
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
@@ -116,15 +93,7 @@ class LoginController extends Controller
             return response()->json(['message' => 'El usuario no pertenece al grupo Moderadores'], 405);
         }
 
-        if (!session()->has('ldap_auth_error')) {
-            return response()->json(['message' => 'Credenciales invalidas, verifique sus datos'], 401);
-        }
-        
-
-
-        throw ValidationException::withMessages([
-            'username' => trans('auth.failed'),
-        ]);
+        return response()->json(['message' => 'Credenciales invalidas, verifique sus datos'], 401);
     }
 
     protected function throttleKey(Request $request): string
