@@ -28,6 +28,7 @@ class User extends Authenticatable implements LdapAuthenticatable
 
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
     ];

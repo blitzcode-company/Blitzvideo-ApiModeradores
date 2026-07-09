@@ -12,11 +12,12 @@ class CreateModeradoresTable extends Migration
         Schema::create('moderadores', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('username')->nullable();
             $table->string('guid')->nullable();
             $table->string('domain')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable()->change();
             $table->rememberToken();
             $table->softDeletes(); 
             $table->timestamps();
