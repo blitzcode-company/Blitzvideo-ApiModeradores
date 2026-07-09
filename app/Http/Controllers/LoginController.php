@@ -38,11 +38,11 @@ class LoginController extends Controller
             'password' => $request->password,
         ];
     
-        if (!Auth::guard('ldap')->attempt($credentials)) {
+        if (!Auth::guard('web')->attempt($credentials)) {
             return $this->handleFailedLogin($request);
         }
     
-        $user = Auth::guard('ldap')->user();
+        $user = Auth::guard('web')->user();
         $token = $user->createToken('api-token')->plainTextToken;
     
         RateLimiter::clear($this->throttleKey($request));
